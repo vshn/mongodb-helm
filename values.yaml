@@ -1,0 +1,29 @@
+backup:
+  encryptionPasswordTemplate: "{{ .backupEncryptionSecret }}"
+  mongodbUrlTemplate: mongodb-0.{{ .namespace }}.svc.cluster.local,mongodb-1.{{ .namespace }}.svc.cluster.local,mongodb-2.{{ .namespace }}.svc.cluster.local/admin
+createNamespace: false
+namespace: ""
+replicas: 3
+allowFromNamespaces: []
+
+mongodb:
+  mongodb:
+    registryOverride:
+    image: library/mongo
+    tag:
+  exporter:
+    registryOverride:
+    image: percona/mongodb_exporter
+    # renovate: datasource=docker depName=percona/mongodb_exporter
+    tag: 0.54.0@sha256:934e9db87e85e0fa63654e73c3504845993a254e898783ca905e65a68848b5a4
+env:
+  MONGODB_LIMITS_CPU: 1
+  MONGODB_LIMITS_MEMORY: 1Gi
+  MONGODB_EXTRA_PASSWORDS: ""
+  # there is no default for MONGODB_PVC_SIZE_GI
+  # resizing is difficult and you anyway need to consider the capacity.
+  # MONGODB_PVC_SIZE_GI: 5
+pvc:
+  encrypted: true
+  storageClassName: ssd-encrypted
+registry: dockerhub.vshn.net

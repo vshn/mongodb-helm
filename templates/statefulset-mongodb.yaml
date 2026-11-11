@@ -1,0 +1,175 @@
+{{ $_:= .Values.env.MONGODB_PVC_SIZE_GI | required "MONGODB_PVC_SIZE_GI is required" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  name: mongodb
+  namespace: {{ include "mongodb.namespace" . }}
+  labels:
+    k8ify.service: mongodb
+spec:
+  selector:
+    matchLabels:
+      k8ify.service: mongodb
+  serviceName: mongodb
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        k8ify.service: mongodb
+      annotations:
+        k8up.io/backupcommand: "sh -c 'mongodump --archive \"mongodb://$MONGODB_ROOT_USER:$MONGODB_ROOT_PASSWORD@$MONGODB_URL\"'"
+        k8up.io/file-extension: .archive
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    k8ify.service: mongodb
+                topologyKey: kubernetes.io/hostname
+      containers:
+      - envFrom:
+        - secretRef:
+            name: mongodb-env
+        - secretRef:
+            name: mongodb-url
+        image: "{{ .Values.mongodb.mongodb.registryOverride | default .Values.registry }}/{{ .Values.mongodb.mongodb.image }}:{{ .Values.mongodb.mongodb.tag | default .Chart.AppVersion }}"
+        command:
+          - '/bin/bash'
+          - '-c'
+          - 'echo "${MONGODB_REPLICA_SET_KEY}" > /tmp/mongod.key; chmod 400 /tmp/mongod.key; /usr/local/bin/docker-entrypoint.sh --auth --replSet "${MONGODB_REPLICA_SET_NAME}" --keyFile /tmp/mongod.key'
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - '-c'
+              - |
+                mongosh "mongodb://${MONGODB_ROOT_USER}:${MONGODB_ROOT_PASSWORD}@localhost:27017/admin" \
+                --eval \
+                "db.adminCommand('ping')" \
+                --quiet
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: mongodb
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ default "500m" .Values.env.MONGODB_LIMITS_CPU | quote }}
+            memory: {{ default "1Gi" .Values.env.MONGODB_LIMITS_MEMORY | quote }}
+          requests:
+            cpu: {{ default "50m" .Values.env.MONGODB_REQUESTS_CPU | quote }}
+            memory: {{ default "1Gi" .Values.env.MONGODB_REQUESTS_MEMORY | quote }}
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - '-c'
+              - |
+                mongosh "mongodb://${MONGODB_ROOT_USER}:${MONGODB_ROOT_PASSWORD}@localhost:27017/admin" \
+                --eval \
+                "db.adminCommand('ping')" \
+                --quiet
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        startupProbe:
+          exec:
+            command:
+              - /bin/sh
+              - '-c'
+              - |
+                mongosh "mongodb://${MONGODB_ROOT_USER}:${MONGODB_ROOT_PASSWORD}@localhost:27017/admin" \
+                --eval \
+                "db.adminCommand('ping')" \
+                --quiet
+          failureThreshold: 30
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+          subPath: data/db
+      - name: mongodb-exporter
+        image: "{{ .Values.mongodb.exporter.registryOverride | default .Values.registry }}/{{ .Values.mongodb.exporter.image }}:{{ .Values.mongodb.exporter.tag }}"
+        imagePullPolicy: IfNotPresent
+        args:
+          - --collector.dbstats
+          - --collector.diagnosticdata
+          - --collector.topmetrics
+          - --collector.replicasetstatus
+          - --discovering-mode
+          - --log.level=warn
+          - --mongodb.global-conn-pool
+        env:
+          - name: MONGODB_URI
+            value: "mongodb://$(MONGODB_ROOT_USER):$(MONGODB_ROOT_PASSWORD)@127.0.0.1:27017/admin"
+        envFrom:
+          - secretRef:
+              name: mongodb-env
+        ports:
+          - name: metrics
+            containerPort: 9216
+            protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: metrics
+          initialDelaySeconds: 15
+          timeoutSeconds: 10
+          periodSeconds: 20
+          failureThreshold: 6
+          successThreshold: 1
+        readinessProbe:
+          tcpSocket:
+            port: metrics
+          initialDelaySeconds: 5
+          timeoutSeconds: 10
+          periodSeconds: 10
+          failureThreshold: 6
+          successThreshold: 1
+        startupProbe:
+          tcpSocket:
+            port: metrics
+          failureThreshold: 30
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        resources:
+          limits:
+            cpu: {{ default "200m" .Values.env.MONGODB_EXPORTER_LIMITS_CPU | quote }}
+            memory: {{ default "128Mi" .Values.env.MONGODB_EXPORTER_LIMITS_MEMORY | quote }}
+          requests:
+            cpu: {{ default "50m" .Values.env.MONGODB_EXPORTER_REQUESTS_CPU | quote }}
+            memory: {{ default "64Mi" .Values.env.MONGODB_EXPORTER_REQUESTS_MEMORY | quote }}
+  updateStrategy: {}
+  replicas: {{ .Values.replicas }}
+  volumeClaimTemplates:
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: mongodb-data
+      creationTimestamp: null
+      annotations:
+        k8up.io/backup: "false"
+      labels:
+        k8ify.service: mongodb
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.env.MONGODB_PVC_SIZE_GI }}Gi
+      storageClassName: {{ .Values.env.MONGODB_PVC_STORAGE_CLASS_NAME | default .Values.pvc.storageClassName }}
+      volumeMode: Filesystem

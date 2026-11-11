@@ -1,0 +1,16 @@
+apiVersion: appcat.vshn.io/v1
+kind: ObjectBucket
+metadata:
+  name: backup-objectbucket
+  namespace: {{ include "mongodb.namespace" . }}
+  annotations:
+    {{- if not .Values.env.DEV_INSTANCE  }}
+    "helm.sh/resource-policy": keep
+    {{- end }}
+spec:
+  parameters:
+    region: {{ .Values.env.BACKUP_OBJECTBUCKET_REGION }}
+    security:
+      deletionProtection: {{ ternary (not .Values.env.DEV_INSTANCE) true false }}
+  writeConnectionSecretToRef:
+    name: k8up-repo

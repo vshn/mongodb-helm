@@ -1,0 +1,35 @@
+apiVersion: k8up.io/v1
+kind: Schedule
+metadata:
+  name: backup-schedule
+  namespace: {{ include "mongodb.namespace" . }}
+spec:
+  backup:
+    schedule: {{ .Values.env.BACKUP_BACKUP_SCHEDULE | default "5 4 * * *" | quote }}
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 1
+  check:
+    schedule: {{ .Values.env.BACKUP_CHECK_SCHEDULE | default "5 6 * * *" | quote }}
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 1
+  prune:
+    schedule: {{ .Values.env.BACKUP_CHECK_SCHEDULE | default "5 7 * * *" | quote }}
+    retention:
+      keepDaily: {{ .Values.env.BACKUP_KEEP_DAILY | default 7 }}
+      keepWeekly: {{ .Values.env.BACKUP_KEEP_WEEKLY | default 2 }}
+      keepMonthly: {{ .Values.env.BACKUP_KEEP_MONTHLY | default 2 }}
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 1
+  backend:
+    repoPasswordSecretRef:
+      key: password
+      name: backup-encryption
+    s3:
+      endpointSecretKey: ENDPOINT
+      bucketSecretKey: BUCKET_NAME
+      accessKeyIDSecretRef:
+        name: k8up-repo
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKeySecretRef:
+        name: k8up-repo
+        key: AWS_SECRET_ACCESS_KEY

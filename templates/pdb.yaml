@@ -1,0 +1,15 @@
+{{- if gt (int .Values.replicas) 1 }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mongodb
+  namespace: {{ include "mongodb.namespace" . }}
+  labels:
+    k8ify.service: mongodb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      k8ify.service: mongodb
+  unhealthyPodEvictionPolicy: IfHealthyBudget
+{{- end }}

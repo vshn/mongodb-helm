@@ -1,0 +1,17 @@
+{{- if and .Values.createNamespace (not .Values.namespace) }}
+{{ fail "you must define a separate namespace for MongoDB if you set createNamespace to true" }}
+{{- end }}
+{{- if .Values.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
+  name: {{ .Values.namespace | quote }}
+  labels:
+    helm.sh/chart: {{ include "mongodb.chart" . }}
+    app.kubernetes.io/name: {{ include "mongodb.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    appuio.io/organization: {{ .Values.appuio_organisation }}
+{{ end }}

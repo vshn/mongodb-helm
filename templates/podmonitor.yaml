@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: mongodb
+  namespace: {{ include "mongodb.namespace" . }}
+  labels:
+    k8ify.service: mongodb
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ include "mongodb.namespace" . }}
+  selector:
+    matchLabels:
+      k8ify.service: mongodb
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 60s
+      scrapeTimeout: 30s
