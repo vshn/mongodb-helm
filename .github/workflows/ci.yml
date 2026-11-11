@@ -1,0 +1,26 @@
+name: Smoke test
+on:
+  pull_request:
+  push:
+  workflow_dispatch: {}
+
+env:
+  HELM_IMAGE: ghcr.io/appuio/helm-v4
+  # renovate: datasource=docker depName=ghcr.io/appuio/helm-v4
+  HELM_VERSION: 4.3.0
+
+jobs:
+
+  chartsnap:
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Compare Helm value snapshots (refresh with ./scripts/chartsnap.sh --update)
+        run: |
+          ./scripts/chartsnap.sh
+          test -z "$(git status --porcelain -- test)"

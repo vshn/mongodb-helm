@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+  ],
+  "minimumReleaseAge": "14 days",
+  customManagers: [
+    {
+      customType: "regex",
+      "managerFilePatterns": ["/./"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)\\n\\s*[A-Za-z_]+[=:]\\s*\"?(?<currentValue>v?[0-9][\\w.-]*)(@(?<currentDigest>[a-z0-9:]*))\"?"
+      ],
+    }
+  ],
+  packageRules: [
+    {
+      matchUpdateTypes: "patch",
+      labels: [
+        "renovate",
+        "dependency",
+        "bump:patch",
+      ],
+    },
+    {
+      matchUpdateTypes: "minor",
+      labels: [
+        "renovate",
+        "dependency",
+        "bump:minor",
+      ],
+    },
+    {
+      matchUpdateTypes: "major",
+      labels: [
+        "renovate",
+        "dependency",
+        "bump:major",
+      ],
+    },
+    {
+      matchFileNames: [
+        "/\\.github/.*/",
+        "/scripts/.*/",
+      ],
+      labels: [
+        "renovate",
+        "dependency",
+      ],
+    },
+    {
+      matchFileNames: [
+        "/Chart\\.yaml$/",
+        "/^values\\.yaml$/",
+        "/^templates/.*/",
+      ],
+      "group": {
+        "branchTopic": "litellm-{{{newMajor}}}.{{{newMinor}}}.{{{newPatch}}}",
+      }
+    }
+  ],
+}

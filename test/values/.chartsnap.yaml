@@ -1,0 +1,82 @@
+# Mask subchart version labels so version bumps (appVersion / dependency bump) don't churn smoke-test.snap; regenerate with ./scripts/chartsnap.sh --update
+dynamicFields:
+  - kind: ServiceAccount
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: Service
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: ServiceMonitor
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: ConfigMap
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: Secret
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: Ingress
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: Deployment
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/template/metadata/labels/helm.sh~1chart
+      - /spec/template/metadata/labels/app.kubernetes.io~1version
+      - /spec/template/spec/initContainers/0/image
+      - /spec/template/spec/initContainers/1/image
+      - /spec/template/spec/initContainers/2/image
+      - /spec/template/spec/containers/0/image
+      - /spec/template/spec/containers/1/image
+      - /spec/template/spec/containers/2/image
+  - kind: StatefulSet
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/template/metadata/labels/helm.sh~1chart
+      - /spec/template/metadata/labels/app.kubernetes.io~1version
+      - /spec/template/spec/initContainers/0/image
+      - /spec/template/spec/initContainers/1/image
+      - /spec/template/spec/initContainers/2/image
+      - /spec/template/spec/containers/0/image
+      - /spec/template/spec/containers/1/image
+      - /spec/template/spec/containers/2/image
+  - kind: Job
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/template/metadata/labels/helm.sh~1chart
+      - /spec/template/metadata/labels/app.kubernetes.io~1version
+  - kind: StatefulSet
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/template/metadata/labels/helm.sh~1chart
+      - /spec/template/metadata/labels/app.kubernetes.io~1version
+  - kind: CronJob
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/jobTemplate/spec/template/metadata/labels/helm.sh~1chart
+      - /spec/jobTemplate/spec/template/metadata/labels/app.kubernetes.io~1version
+  - kind: DaemonSet
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+      - /spec/template/metadata/labels/helm.sh~1chart
+      - /spec/template/metadata/labels/app.kubernetes.io~1version
+  - kind: Pod
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version
+  - kind: PersistentVolumeClaim
+    jsonPath:
+      - /metadata/labels/helm.sh~1chart
+      - /metadata/labels/app.kubernetes.io~1version

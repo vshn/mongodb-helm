@@ -1,0 +1,10 @@
+env:
+  MONGODB_PVC_SIZE_GI: 5
+  MONGODB_ROOT_PASSWORD: smoke-test-password
+  MONGODB_REPLICA_SET_KEY: smoke-test-key
+  OPENBAO_SVC_NAME: openbao
+  OPENBAO_NAMESPACE: openbao
+  BACKUP_OBJECTBUCKET_REGION: rma
+  MONGODB_DATA_MONGODB_0_LUKS_KEY: smoke-test-luks-key-0
+  MONGODB_DATA_MONGODB_1_LUKS_KEY: smoke-test-luks-key-1
+  MONGODB_DATA_MONGODB_2_LUKS_KEY: smoke-test-luks-key-2
