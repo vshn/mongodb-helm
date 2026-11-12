@@ -2,4 +2,4 @@ apiVersion: v1
 name: mongodb
 version: "0.1.0"
 # renovate: datasource=docker depName=mongo
-appVersion: "8.2@sha256:e0ce8c35124d4a9f9785532d1f268f39e9728ffa1cb38f46fa482436424c4bd3"
+appVersion: "8.3.17@sha256:0f64db83d5926400d1cbcbaf35fbf2b0dfa6a4eaa71e04a26481a38cd803b27b"
