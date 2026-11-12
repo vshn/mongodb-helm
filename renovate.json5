@@ -56,7 +56,7 @@
         "/^templates/.*/",
       ],
       "group": {
-        "branchTopic": "litellm-{{{newMajor}}}.{{{newMinor}}}.{{{newPatch}}}",
+        "branchTopic": "mongodb-{{{newMajor}}}.{{{newMinor}}}.{{{newPatch}}}",
       }
     }
   ],
