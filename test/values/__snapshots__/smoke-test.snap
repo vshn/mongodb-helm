@@ -169,7 +169,7 @@ spec:
         helm.sh/chart: '###DYNAMIC_FIELD###'
         app.kubernetes.io/version: '###DYNAMIC_FIELD###'
       annotations:
-        k8up.io/backupcommand: "sh -c 'mongodump --archive \"mongodb://$MONGODB_ROOT_USER:$MONGODB_ROOT_PASSWORD@$MONGODB_URL\"'"
+        k8up.io/backupcommand: "sh -c 'mongodump --archive \"mongodb://$MONGODB_ROOT_USER:$MONGODB_ROOT_PASSWORD@mongodb-0.mongodb.svc.cluster.local,mongodb-1.mongodb.svc.cluster.local,mongodb-2.mongodb.svc.cluster.local/admin\"'"
         k8up.io/file-extension: .archive
     spec:
       affinity:
@@ -185,8 +185,6 @@ spec:
       - envFrom:
         - secretRef:
             name: mongodb-env
-        - secretRef:
-            name: mongodb-url
         image: "###DYNAMIC_FIELD###"
         command:
         - '/bin/bash'
@@ -345,26 +343,6 @@ spec:
   dataFrom:
   - extract:
       key: app/test/mongo
----
-# Source: mongodb/templates/backup/mongodb-url.yaml
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: mongodb-url
-  namespace: "mongodb"
-spec:
-  refreshInterval: "1h"
-  secretStoreRef:
-    name: mongodb-store
-    kind: SecretStore
-  target:
-    name: mongodb-url
-    template:
-      data:
-        MONGODB_URL: mongodb-0.{{ .namespace }}.svc.cluster.local,mongodb-1.{{ .namespace }}.svc.cluster.local,mongodb-2.{{ .namespace }}.svc.cluster.local/admin
-  dataFrom:
-  - extract:
-      key: app/dev/mongo
 ---
 # Source: mongodb/templates/backup/objectbucket.yaml
 apiVersion: appcat.vshn.io/v1
