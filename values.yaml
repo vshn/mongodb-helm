@@ -22,6 +22,17 @@ env:
   # there is no default for MONGODB_PVC_SIZE_GI
   # resizing is difficult and you anyway need to consider the capacity.
   # MONGODB_PVC_SIZE_GI: 5
+  # e.g. accounting-app/login-service
+  OPENBAO_SECRETS_PATH_PREFIX:
+  # defaults to {{ .Release.Name }}, do not use leading or trailing slashes
+  # OPENBAO_SECRETS_ENVIRONMENT_SLUG
+  OPENBAO_SECRETS_PATH_SUFFIX: mongo
+
+  # e.g. accounting-app/login-service
+  # INTERNAL_OPENBAO_SECRETS_PATH_PREFIX:
+  # defaults to {{ .Release.Name }}, do not use leading or trailing slashes
+  # INTERNAL_OPENBAO_SECRETS_ENVIRONMENT_SLUG
+  # INTERNAL_OPENBAO_SECRETS_PATH_SUFFIX: mongo
 pvc:
   encrypted: true
   storageClassName: ssd-encrypted

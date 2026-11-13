@@ -342,7 +342,7 @@ spec:
         password: "{{ .backupEncryptionSecret }}"
   dataFrom:
   - extract:
-      key: app/test/mongo
+      key: accounting-app/login-service/test/mongo
 ---
 # Source: mongodb/templates/backup/objectbucket.yaml
 apiVersion: appcat.vshn.io/v1
