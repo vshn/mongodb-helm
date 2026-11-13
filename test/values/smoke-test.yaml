@@ -2,6 +2,7 @@ env:
   MONGODB_PVC_SIZE_GI: 5
   MONGODB_ROOT_PASSWORD: smoke-test-password
   MONGODB_REPLICA_SET_KEY: smoke-test-key
+  OPENBAO_SECRETS_PATH_PREFIX: accounting-app/login-service
   OPENBAO_SVC_NAME: openbao
   OPENBAO_NAMESPACE: openbao
   BACKUP_OBJECTBUCKET_REGION: rma
