@@ -4,7 +4,8 @@ createNamespace: false
 namespace: ""
 replicas: 3
 allowFromNamespaces: []
-
+# currently externalsecrets or plain. plain is not yet fully implemented.
+secretManagement: "plain"
 mongodb:
   mongodb:
     registryOverride:
