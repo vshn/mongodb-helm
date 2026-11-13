@@ -1,4 +1,11 @@
 {{ $_:= .Values.env.MONGODB_PVC_SIZE_GI | required "MONGODB_PVC_SIZE_GI is required" }}
+{{ $mongoDBHostUrlPart := "" }}
+{{- range $i, $_ := until (.Values.replicas | int) }}
+  {{- if ne $i 0 }}
+  {{- $mongoDBHostUrlPart = printf "%s," $mongoDBHostUrlPart }}
+  {{- end }}
+  {{- $mongoDBHostUrlPart = printf "%smongodb-%s.%s.svc.cluster.local" $mongoDBHostUrlPart ($i | toString) $.Release.Namespace }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -18,7 +25,7 @@ spec:
       labels:
         k8ify.service: mongodb
       annotations:
-        k8up.io/backupcommand: "sh -c 'mongodump --archive \"mongodb://$MONGODB_ROOT_USER:$MONGODB_ROOT_PASSWORD@$MONGODB_URL\"'"
+        k8up.io/backupcommand: "sh -c 'mongodump --archive \"mongodb://$MONGODB_ROOT_USER:$MONGODB_ROOT_PASSWORD@{{ $mongoDBHostUrlPart }}/admin\"'"
         k8up.io/file-extension: .archive
     spec:
       affinity:
@@ -34,8 +41,6 @@ spec:
       - envFrom:
         - secretRef:
             name: mongodb-env
-        - secretRef:
-            name: mongodb-url
         image: "{{ .Values.mongodb.mongodb.registryOverride | default .Values.registry }}/{{ .Values.mongodb.mongodb.image }}:{{ .Values.mongodb.mongodb.tag | default .Chart.AppVersion }}"
         command:
           - '/bin/bash'

@@ -1,6 +1,5 @@
 backup:
   encryptionPasswordTemplate: "{{ .backupEncryptionSecret }}"
-  mongodbUrlTemplate: mongodb-0.{{ .namespace }}.svc.cluster.local,mongodb-1.{{ .namespace }}.svc.cluster.local,mongodb-2.{{ .namespace }}.svc.cluster.local/admin
 createNamespace: false
 namespace: ""
 replicas: 3
