@@ -1,5 +1,5 @@
 {{- $root := . }}
-{{- range $i, $e := until 3 }}
+{{- range $i, $e := until (.Values.replicas | int) }}
 ---
 kind: Service
 apiVersion: v1
