@@ -1,11 +1,10 @@
-{{- $root := . }}
-{{- range $i, $e := until 3 }}
+{{- range $i, $e := until (.Values.replicas | int) }}
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: mongodb-{{ $i }}
-  namespace: {{ include "mongodb.namespace" $root }}
+  namespace: {{ include "mongodb.namespace" $ }}
   labels:
     k8ify.service: mongodb
 spec:

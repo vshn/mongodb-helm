@@ -25,63 +25,6 @@ metadata:
     helm.sh/chart: '###DYNAMIC_FIELD###'
     app.kubernetes.io/version: '###DYNAMIC_FIELD###'
 ---
-# Source: mongodb/templates/secret-mongodb-data-mongodb-0-luks-key.yaml
-kind: Secret
-apiVersion: v1
-metadata:
-  name: mongodb-data-mongodb-0-luks-key
-  namespace: "mongodb"
-  labels:
-    k8ify.service: mongodb
-    helm.sh/chart: '###DYNAMIC_FIELD###'
-    app.kubernetes.io/version: '###DYNAMIC_FIELD###'
-data:
-  luksKey: c21va2UtdGVzdC1sdWtzLWtleS0w
----
-# Source: mongodb/templates/secret-mongodb-data-mongodb-1-luks-key.yaml
-kind: Secret
-apiVersion: v1
-metadata:
-  name: mongodb-data-mongodb-1-luks-key
-  namespace: "mongodb"
-  labels:
-    k8ify.service: mongodb
-    helm.sh/chart: '###DYNAMIC_FIELD###'
-    app.kubernetes.io/version: '###DYNAMIC_FIELD###'
-data:
-  luksKey: c21va2UtdGVzdC1sdWtzLWtleS0x
----
-# Source: mongodb/templates/secret-mongodb-data-mongodb-2-luks-key.yaml
-kind: Secret
-apiVersion: v1
-metadata:
-  name: mongodb-data-mongodb-2-luks-key
-  namespace: "mongodb"
-  labels:
-    k8ify.service: mongodb
-    helm.sh/chart: '###DYNAMIC_FIELD###'
-    app.kubernetes.io/version: '###DYNAMIC_FIELD###'
-data:
-  luksKey: c21va2UtdGVzdC1sdWtzLWtleS0y
----
-# Source: mongodb/templates/secret-mongodb-env.yaml
-kind: Secret
-apiVersion: v1
-metadata:
-  name: mongodb-env
-  namespace: "mongodb"
-  labels:
-    k8ify.service: mongodb
-    helm.sh/chart: '###DYNAMIC_FIELD###'
-    app.kubernetes.io/version: '###DYNAMIC_FIELD###'
-data:
-  MONGO_INITDB_ROOT_USERNAME: cm9vdA==
-  MONGO_INITDB_ROOT_PASSWORD: c21va2UtdGVzdC1wYXNzd29yZA==
-  MONGODB_ROOT_USER: cm9vdA==
-  MONGODB_ROOT_PASSWORD: c21va2UtdGVzdC1wYXNzd29yZA==
-  MONGODB_REPLICA_SET_NAME: dGVzdA==
-  MONGODB_REPLICA_SET_KEY: c21va2UtdGVzdC1rZXk=
----
 # Source: mongodb/templates/service-mongodb.yaml
 kind: Service
 apiVersion: v1
@@ -340,6 +283,103 @@ spec:
     template:
       data:
         password: "{{ .backupEncryptionSecret }}"
+  dataFrom:
+  - extract:
+      key: accounting-app/login-service/test/mongo
+---
+# Source: mongodb/templates/externalsecrets.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mongodb-env
+  namespace: "mongodb"
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: mongodb-store
+    kind: SecretStore
+  target:
+    name: mongodb-env
+    template:
+      metadata:
+        labels:
+          k8ify.service: mongodb
+      data:
+        MONGO_INITDB_ROOT_USERNAME: "root"
+        MONGO_INITDB_ROOT_PASSWORD: "{{ .rootPassword }}"
+        MONGODB_ROOT_USER: "root"
+        MONGODB_ROOT_PASSWORD: "{{ .rootPassword }}"
+        MONGODB_REPLICA_SET_NAME: "test"
+        MONGODB_REPLICA_SET_KEY: "{{ .replicaSetKey }}"
+  dataFrom:
+  - extract:
+      key: accounting-app/login-service/test/mongo
+---
+# Source: mongodb/templates/externalsecrets.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mongodb-data-mongodb-0-luks-key
+  namespace: "mongodb"
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: mongodb-store
+    kind: SecretStore
+  target:
+    name: mongodb-data-mongodb-0-luks-key
+    template:
+      metadata:
+        labels:
+          k8ify.service: mongodb
+      data:
+        luksKey: "{{ .luksKey }}"
+  dataFrom:
+  - extract:
+      key: accounting-app/login-service/test/mongo
+---
+# Source: mongodb/templates/externalsecrets.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mongodb-data-mongodb-1-luks-key
+  namespace: "mongodb"
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: mongodb-store
+    kind: SecretStore
+  target:
+    name: mongodb-data-mongodb-1-luks-key
+    template:
+      metadata:
+        labels:
+          k8ify.service: mongodb
+      data:
+        luksKey: "{{ .luksKey }}"
+  dataFrom:
+  - extract:
+      key: accounting-app/login-service/test/mongo
+---
+# Source: mongodb/templates/externalsecrets.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mongodb-data-mongodb-2-luks-key
+  namespace: "mongodb"
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: mongodb-store
+    kind: SecretStore
+  target:
+    name: mongodb-data-mongodb-2-luks-key
+    template:
+      metadata:
+        labels:
+          k8ify.service: mongodb
+      data:
+        luksKey: "{{ .luksKey }}"
   dataFrom:
   - extract:
       key: accounting-app/login-service/test/mongo
